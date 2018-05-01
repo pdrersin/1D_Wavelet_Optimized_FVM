@@ -1,20 +1,15 @@
 #ifndef Datastruct_h_inluded
 #define Datastruct_h_inluded
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
-/// \file Datastruct.h
-/// \brief Header for data structure related functions
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
+/** \file Datastruct.h
+ *  \brief Header file for datastructure related functions \n
+*/
 
-
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn void check_leaves(unordered_map<int,Cell*> &Cellvect);
-/// \brief Marks leaves
-/// \brief Just sweeps through entire unordered map
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
+/** \brief Marks leaves by sweeping through unordered_map \n
+ *  Logic for leaf flag switch is if a cell has children or not.
+ * \param unordered_map<int,Cell*> &Cellvect
+ * \return void
+ *
+ */
 void check_leaves(unordered_map<int,Cell*> &Cellvect)
 {
     for (auto citer_one=Cellvect.begin();citer_one!=Cellvect.end();citer_one++)
@@ -29,13 +24,17 @@ void check_leaves(unordered_map<int,Cell*> &Cellvect)
     }
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn bool find_cell_exist(int i, unordered_map<int,Cell*> &Cellvect);
-/// \brief Logical function to find if cell exists
-/// \brief Note that the first element of vector must be i=1
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+/** \brief Logical function to determine if a particular cell exists \n
+ *  Takes in an index i (unique cell index) \n
+ *  Logical function to find if cell exists by path traversal from root to cell \n
+ *  Returns boolean output \n
+ * \param unordered_map<int,Cell*> &Cellvect
+ * \param i
+ * \return bool
+ *
+ */
 bool find_cell_exist(int i, unordered_map<int,Cell*> &Cellvect)
 {
     //Note that first element of Cellvect has to be the root.
@@ -106,13 +105,15 @@ bool find_cell_exist(int i, unordered_map<int,Cell*> &Cellvect)
 
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn Cell* find_cell(int, int, unordered_map<int,Cell*> &Cellvect);
-/// \brief Returns cell* to particular i value
-/// \brief ALWAYS use once cell is confirmed to exist
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
+
+/** \brief Function returns pointer to a particular cell with given i value \n
+ *  Takes in an index i (unique cell index) \n
+ *  Returns Cell* to this i value \n
+ * \param unordered_map<int,Cell*> &Cellvect
+ * \param i
+ * \return Cell*
+ *
+ */
 Cell* find_cell(int i, unordered_map<int,Cell*> &Cellvect)//Use after verifying that cell exists
 {
     //Note that first element of Cellvect has to be the root.
@@ -164,14 +165,14 @@ Cell* find_cell(int i, unordered_map<int,Cell*> &Cellvect)//Use after verifying 
 }
 
 
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn void link_level_neighbors(unordered_map<int,Cell*> &Cellvect)
-/// \brief Links to neighboring level if cell exists
-/// \brief Required for interpolations
-/// \brief Assumes periodicity(1) or Open(2)
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
+
+/** \brief Function links to neighboring level if cell exists \n
+ *  Required for interpolations \n
+ *  Varies at boundaries according to periodic or open boundary conditions
+ * \param unordered_map<int,Cell*> &Cellvect
+ * \return void
+ *
+ */
 void link_level_neighbors(unordered_map<int,Cell*> &Cellvect)
 {
 
@@ -230,16 +231,13 @@ void link_level_neighbors(unordered_map<int,Cell*> &Cellvect)
     }
 }
 
-
-
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn void keep_cell(int i, unordered_map<int,Cell*> &Cellvect);
-/// \brief Either changes existent cell keep_flag to 1 or makes new cell
-/// \brief Note that this does not decode
-/// \brief Must set new_cell=1 in this function
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
+/** \brief Function either changes existent cell keep_flag to 1 or makes new cell \n
+ *  Also sets new_cell flag as 1 (even if cell was already present) \n
+ * \param unordered_map<int,Cell*> &Cellvect
+ * \param i
+ * \return void
+ *
+ */
 void keep_cell(int i, int level, unordered_map<int,Cell*> &Cellvect)
 {
 
@@ -372,14 +370,15 @@ void keep_cell(int i, int level, unordered_map<int,Cell*> &Cellvect)
     }
 }
 
-
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn unordered_map<Cell*> level_vector(int level, unordered_map<int,Cell*> &Cellvect);
-/// \brief Returns a vector of memory addresses to elements of the same level
-/// \brief Useful for level operations which are incremented or decremented
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
+/** \brief Function returns an unordered_map of memory addresses to Cells of the same level \n
+ *  Useful for level operations which are incremented or decremented \n
+ *  Note that changes on this unordered_map also affect global binary tree \n
+ *  These are just pointers(or memory addresses) \n
+ * \param unordered_map<int,Cell*> &Cellvect
+ * \param level
+ * \return unordered_map<Cell*>
+ *
+ */
 unordered_map<int,Cell*> level_vector(int level, unordered_map<int,Cell*> &Cellvect)
 {
     unordered_map<int,Cell*>levelvector;
@@ -405,13 +404,15 @@ unordered_map<int,Cell*> level_vector(int level, unordered_map<int,Cell*> &Cellv
     return levelvector;
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn unordered_map<Cell*> leaf_vector(unordered_map<int,Cell*> &Cellvect);
-/// \brief Returns a vector of memory addresses to leaves
-/// \brief Useful for final stage time advancement
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
+/** \brief Function returns an unordered_map of memory addresses to Cells which are leaves \n
+ *  Our governing law essentially evolves on this unordered_map \n
+ *  Note that changes on this unordered_map also affect global binary tree \n
+ *  These are just pointers(or memory addresses) \n
+ * \param unordered_map<int,Cell*> &Cellvect
+ * \param level
+ * \return unordered_map<Cell*>
+ *
+ */
 unordered_map<int,Cell*> leaf_vector(unordered_map<int,Cell*> &Cellvect)
 {
     unordered_map<int,Cell*>leafvector;
@@ -427,14 +428,14 @@ unordered_map<int,Cell*> leaf_vector(unordered_map<int,Cell*> &Cellvect)
     return leafvector;
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn void keep_cell_virt(int i, unordered_map<int,Cell*> &Cellvect);
-/// \brief Makes new virtual cell
-/// \brief Note that this does not decode
-/// \brief Must set new_cell=1 and virt=1 in this function
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
+
+/** \brief Function makes a new virtual cell for conservative flux calculations \n
+ *  Also sets new_cell flag as 1 and virt flag as 1 \n
+ * \param unordered_map<int,Cell*> &Cellvect
+ * \param i
+ * \return void
+ *
+ */
 void keep_cell_virt(int i, int level, unordered_map<int,Cell*> &Cellvect)
 {
 
@@ -576,13 +577,15 @@ void keep_cell_virt(int i, int level, unordered_map<int,Cell*> &Cellvect)
     }
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn void delete_cell(int i, unordered_map<key,Cell*> &Cellvect);
-/// \brief Severs pointers for parent and neighbors
-/// \brief Does not sever pointers children as if cell has children it must be in graded structure
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
+
+/** \brief Function deletes an unnecessary cell \n
+ *  Also severs pointers for parent and neighbors \n
+ *  Does not delete if cell as has children as it must be in graded structure \n
+ * \param unordered_map<int,Cell*> &Cellvect
+ * \param i
+ * \return void
+ *
+ */
 void delete_cell(int i, unordered_map<int,Cell*> &Cellvect)
 {
     Cell* loc = find_cell(i,Cellvect);
@@ -613,13 +616,15 @@ void delete_cell(int i, unordered_map<int,Cell*> &Cellvect)
     delete(loc);
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn void periodize(int i, int level);
-/// \brief Periodizes a particular i value for Periodic BC
-/// \brief Connects boundary node to itself for Open BC
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
+
+/** \brief Function updates index values to reflect boundary conditions \n
+ *  Adapts i such that boundary is either periodic or open \n
+ *  Connects boundary node to itself for Open BC \n
+ * \param unordered_map<int,Cell*> &Cellvect
+ * \param i
+ * \return void
+ *
+ */
 int periodize(int i, int level)
 {
     if (bc_type==1)

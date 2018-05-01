@@ -1,19 +1,18 @@
 #ifndef Time_Int_h_inluded
 #define Time_Int_h_inluded
 
-///////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////
-/// \file Time_Int.h
-/// \brief Header for time integration, flux calculation
-///////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////
+/** \file Time_Int.h
+ *  \brief Header file for Runge-Kutta third order time integration \n
+*/
 
-///////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////
-/// \fn    void evolution(unordered_map<int,Cell*> &Cellvect);
-/// \brief Control panel for time integration
-///////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////
+
+/** \brief This function is the control panel for time integration \n
+ *  Also outputs metrics for the size of datastructure with time \n
+ *  Also calls functions from Output.h for periodic recording of spatial field. \n
+ * \param unordered_map<int,Cell*> &Cellvect
+ * \return void
+ *
+ */
 void evolution(unordered_map<int,Cell*> &Cellvect)
 {
     double t=0.0;
@@ -78,12 +77,14 @@ void evolution(unordered_map<int,Cell*> &Cellvect)
     myfile.close();
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////
-/// \fn    string NumtoStr (int a);
-/// \brief Converts integer to string
-///////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////
+
+
+/** \brief This function converts an integer to string \n
+ *  Required for filename modification in periodic output \n
+ * \param int a
+ * \return string
+ *
+ */
 string NumtoStr (int a)
 {
     ostringstream temp;
@@ -92,18 +93,20 @@ string NumtoStr (int a)
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn    void runge_kutta_3(unordered_map<int,Cell*> &leafvector, unordered_map<int,Cell*> &Cellvect);
-/// \brief TVD RK3 - Used since time immemorial
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/** \brief Function for total-variation-diminishing Runge-Kutta third-order ODE integrator \n
+ *  Also outputs metrics for the size of datastructure with time \n
+ *  Note extra steps related to conservative correction and substage decoding of physical values into virtual leaves
+ * \param unordered_map<int,Cell*> &Cellvect
+ * \param unordered_map<int,Cell*> &leafvector
+ * \return void
+ *
+ */
 void runge_kutta_3(unordered_map<int,Cell*> &leafvector, unordered_map<int,Cell*> &Cellvect)
 {
 
     calculate_monotonic_fluxes(leafvector);//This calculates fluxes  monotonically near shocks
     conservative_correction(leafvector,Cellvect);
-    calculate_sources(leafvector);
 
     for (auto citer_one = leafvector.begin();citer_one != leafvector.end(); citer_one++)
     {
@@ -125,7 +128,6 @@ void runge_kutta_3(unordered_map<int,Cell*> &leafvector, unordered_map<int,Cell*
     //substage_decode(Cellvect);//Update virtual cell values
     calculate_monotonic_fluxes(leafvector);//This calculates fluxes  monotonically near shocks
     conservative_correction(leafvector,Cellvect);
-    calculate_sources(leafvector);
 
     for (auto citer_one = leafvector.begin();citer_one != leafvector.end(); citer_one++)
     {
@@ -144,7 +146,6 @@ void runge_kutta_3(unordered_map<int,Cell*> &leafvector, unordered_map<int,Cell*
     //substage_decode(Cellvect);//Update virtual cell values
     calculate_monotonic_fluxes(leafvector);//This calculates fluxes  monotonically near shocks
     conservative_correction(leafvector,Cellvect);
-    calculate_sources(leafvector);
 
     for (auto citer_one = leafvector.begin();citer_one != leafvector.end(); citer_one++)
     {
@@ -176,12 +177,11 @@ void runge_kutta_3(unordered_map<int,Cell*> &leafvector, unordered_map<int,Cell*
 }
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn    int find_min_level(unordered_map<int,Cell*> &leafvector)
-/// \brief Finding the least refined level
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/** \brief Function finds the minimum level of resolution among leaves i.e. the least refined level \n
+ * \param unordered_map<int,Cell*> &leafvector
+ * \return int
+ *
+ */
 int find_min_level(unordered_map<int,Cell*> &leafvector)
 {
     int min_level = max_level;
@@ -195,12 +195,11 @@ int find_min_level(unordered_map<int,Cell*> &leafvector)
 
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn    int find_min_level(unordered_map<int,Cell*> &leafvector)
-/// \brief Finding the least refined level
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/** \brief Function finds the maximum level of resolution among leaves i.e. the most refined level \n
+ * \param unordered_map<int,Cell*> &leafvector
+ * \return int
+ *
+ */
 int find_max_level(unordered_map<int,Cell*> &leafvector)
 {
     int temp_max_level = 0;

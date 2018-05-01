@@ -1,21 +1,17 @@
 #ifndef Wavelet_h_inluded
 #define Wavelet_h_inluded
 
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
-/// \file Wavelet.h
-/// \brief Header for wavelet coefficient calculation
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
+/** \file Wavelet.h
+ *  \brief Header file for wavelet coefficient calculation \n
+ * This file also determines projection, prediction and thresholding operations.
+*/
 
-
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn    void encode(unordered_map<int,Cell*> &);
-/// \brief This is a control panel for calculation of wavelet coefficients
-/// \brief Calls two functions for projection and detail calculation respectively
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
+/** \brief This is a control panel for calculation of wavelet coefficients \n
+ *  Calls two functions for projection and detail calculation respectively \n
+ * \param unordered_map<int,Cell*> &Cellvect
+ * \return void
+ *
+ */
 void encode(unordered_map<int,Cell*> &Cellvect)
 {
     projection(Cellvect);
@@ -24,14 +20,13 @@ void encode(unordered_map<int,Cell*> &Cellvect)
 }
 
 
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn    void projection(unordered_map<int,Cell*> &Cellvect);
-/// \brief Projection from leaves towards root
-/// \brief Calculates average cell value of variable at parent
-/// \brief Uses equation 2.28 in Tenaud tutorial
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
+/** \brief Function enables conservative projection from leaves towards root \n
+ *  Calculates average cell value of variable at parent \n
+ *  Refer Tenaud tutorial equation 2.28 \n
+ * \param unordered_map<int,Cell*> &Cellvect
+ * \return void
+ *
+ */
 void projection(unordered_map<int,Cell*> &Cellvect)
 {
     int level = max_level-1;
@@ -69,15 +64,15 @@ void projection(unordered_map<int,Cell*> &Cellvect)
     }
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn    void details_calculation(unordered_map<int,Cell*> &Cellvect);
-/// \brief Uses projection to reinterpolate at finer levels
-/// \brief Stores wavelet coefficients as difference of true vals and interpolated ones
-/// \brief Uses step 6 in Algorithm 1 Tenaud tutorial
-/// \brief Note that there are no details calculated for level 0 (or root since it has no parents)
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
+
+/** \brief Function uses projection to reinterpolate at finer levels \n
+ *  Stores wavelet coefficients as difference of true values and interpolated ones \n
+ *  Uses step 6 in Algorithm 1 Tenaud tutorial \n
+ *  Note that there are no details calculated for level 0 (or root since it has no parents) \n
+ * \param unordered_map<int,Cell*> &Cellvect
+ * \return void
+ *
+ */
 void details_calculation(unordered_map<int,Cell*> &Cellvect)
 {
     int level = max_level;
@@ -130,15 +125,15 @@ void details_calculation(unordered_map<int,Cell*> &Cellvect)
     }
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn    void preserve_graded_structure(unordered_map<int,Cell*> &Cellvect);
-/// \brief This subroutine is used after marking cells for deletion or retention
-/// \brief Any cell that must be kept has its parent stencil retained
-/// \brief This follows steps 13-25: Algorithm 3 Tenaud tutorial
-/// \brief Assumes tree is already graded at the end of previous refinement
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
+/** \brief Function preserves binary graded structure to ensure appropriate linkages across resolutions \n
+ *  This subroutine must be used after marking cells for deletion or retention
+ *  Any cell that must be kept has its parent stencil retained \n
+ *  This follows steps 13-25: Algorithm 3 Tenaud tutorial \n
+ *  Assumes tree is already graded at the end of previous refinement \n
+ * \param unordered_map<int,Cell*> &Cellvect
+ * \return void
+ *
+ */
 void preserve_graded_structure(unordered_map<int,Cell*> &Cellvect)
 {
     int level = max_level;
@@ -183,12 +178,17 @@ void preserve_graded_structure(unordered_map<int,Cell*> &Cellvect)
 }
 
 
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn    void hartens_predictive_thresholding(unordered_map<int,Cell*> &Cellvect);
-/// \brief Used to determine if a cell must be kept in the tree structure or not
-/// \brief In addition, adds virtual cells and decodes them to ensure stencil retention for fluxes
-//////////////////////////////////////////////////////////////////////////////////////////////////
+
+/** \brief Function thresholds datastructure in order to bound perturbation error theoretically \n
+ *  Used to determine if a cell must be kept in the tree structure or not
+ *  In addition, adds virtual cells and decodes them to ensure stencil retention for fluxes \n
+ *  This function is key in ensuring error scales linearly with wavelet coefficient \n
+ *  Refer IJNMF paper for linear scaling verification
+ *  Algorithm 5 in Tenaud tutorial \n
+ * \param unordered_map<int,Cell*> &Cellvect
+ * \return void
+ *
+ */
 void hartens_predictive_thresholding(unordered_map<int,Cell*> &Cellvect)
 {
     int level = max_level - 1;
@@ -311,15 +311,13 @@ void hartens_predictive_thresholding(unordered_map<int,Cell*> &Cellvect)
     decode_new_cells(Cellvect);
 }
 
-
-
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn    double find_max_detail(unordered_map<int,Cell*> &Cellvect);
-/// \brief Finds the maximum value of the wavelet coefficient at a particular level of refinement
-/// \brief Needed for Harten's thresholding
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
+/** \brief Function finds the maximum value of the wavelet coefficient for the given unordered map \n
+ *  Generally fed a level_vector and not the entire Cellvect unordered_map \n
+ *  Needed for Harten's predictive thresholding \n
+ * \param unordered_map<int,Cell*> &Cellvect
+ * \return double
+ *
+ */
 double find_max_detail(unordered_map<int,Cell*> &Cellvect)
 {
     double max_detail=0.0;
@@ -351,13 +349,14 @@ double find_max_detail(unordered_map<int,Cell*> &Cellvect)
 }
 
 
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn    void find_max_vals(unordered_map<int,Cell*> &Cellvect,double (&global_max)[n_eq]);
-/// \brief Finds the maximum value of each conserved variable globally
-/// \brief Needed for Harten's thresholding
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
+/** \brief Function finds the maximum value of each conserved variable globally \n
+ *  Can be fed Cellvect or Levelvect unordered_maps \n
+ *  Needed for Harten's predictive thresholding \n
+ * \param unordered_map<int,Cell*> &Cellvect
+ * \param double (&global_max)[n_eq]
+ * \return void
+ *
+ */
 void find_max_vals(unordered_map<int,Cell*> &Cellvect,double (&global_max)[n_eq])
 {
     for (int j=0;j<=n_eq-1;j++)
@@ -372,14 +371,14 @@ void find_max_vals(unordered_map<int,Cell*> &Cellvect,double (&global_max)[n_eq]
 }
 
 
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn    void conservative_refinement(unordered_map<int,Cell*> &Cellvect);
-/// \brief Used to ensure that Hartens thresholding always has children of children etc
-/// \brief If any cell has atleast one child - it should have all 2 children.
-/// \brief Used within hartens_predictive_thresholding function
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
+
+/** \brief Function used to ensure that post thresholding the existence of one child ensures existence of all children \n
+ *  For example - If any cell has atleast one child - it should have all 2 children. \n
+ *  Needed for Harten's predictive thresholding \n
+ * \param unordered_map<int,Cell*> &Cellvect
+ * \return void
+ *
+ */
 void conservative_refinement(unordered_map<int,Cell*> &Cellvect)
 {
     int level = 0;
@@ -423,13 +422,13 @@ void conservative_refinement(unordered_map<int,Cell*> &Cellvect)
     }
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn void add_virtual_cells(unordered_map<int,Cell*> &Cellvect);
-/// \brief Refer page 27 Tenaud Tutorial
-/// \brief All newly created cells must have virt=1
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
+
+/** \brief Function adds virtual cells to ensure stability for advective solution and conservative flux calculation \n
+ *  Refer step 3(v) in Algorithm 6 of Tenaud tutorial. \n
+ * \param unordered_map<int,Cell*> &Cellvect
+ * \return void
+ *
+ */
 void add_virtual_cells(unordered_map<int,Cell*> &Cellvect)
 {
     int level = 0;
@@ -513,13 +512,15 @@ void add_virtual_cells(unordered_map<int,Cell*> &Cellvect)
 }
 
 
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn void delete_unnecessary_cells(unordered_map<int,Cell*> &Cellvect);
-/// \brief Deletes all cells with keep_flag zero. Simple.
-/// \brief Must be used after all thresholding, virtual cells, conservative refinement etc
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
+
+/** \brief Function deletes cell which are deemed to be superfluous by Harten's predictive and conservative thresholding \n
+ *  Deletes all cells with keep_flag zero. Simple. \n
+ *  Must be used after all thresholding, virtual cells, conservative refinement etc \n
+ *  Note Tenaud uses this before adding virtual cells - we do it after. Theoretically no difference (as shown by scaling)
+ * \param unordered_map<int,Cell*> &Cellvect
+ * \return void
+ *
+ */
 void delete_unnecessary_cells(unordered_map<int,Cell*> &Cellvect)
 {
     int level = max_level;
@@ -547,13 +548,14 @@ void delete_unnecessary_cells(unordered_map<int,Cell*> &Cellvect)
     }
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn void decode_new_cells(unordered_map<int,Cell*> &Cellvect);
-/// \brief New cells created are given approximate field values
-/// \brief Linkages must be complete (and tree must be graded prior to this)
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
+
+/** \brief Function interpolates to find solutions at newly created cells \n
+ *  Linkages must be complete (and tree must be graded prior to this) \n
+ *  Refer algorithm 2 in Tenaud tutorial \n
+ * \param unordered_map<int,Cell*> &Cellvect
+ * \return void
+ *
+ */
 void decode_new_cells(unordered_map<int,Cell*> &Cellvect)
 {
     int level = 1;
@@ -623,13 +625,16 @@ void decode_new_cells(unordered_map<int,Cell*> &Cellvect)
     }
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn void substage_decode(unordered_map<int,Cell*> &Cellvect);
-/// \brief Virtual cells are updated for the substage solution of RK3
-/// \brief Linkages must be complete (and tree must be graded prior to this)
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
+
+/** \brief Function interpolates to find solutions at virtual cells at each substage of RK3 \n
+ *  This is our addition above what Tenaud did (he does not use multistep time integrators) \n
+ *  Virtual leaves (where the solution does not evolve) must reflect update of solution on true leaves \n
+ *  Solution from true leaves is encoded towards root and cascaded downwards into virtual leaves \n
+ *  Note that this does not affect final solution much - not used in IJNMF
+ * \param unordered_map<int,Cell*> &Cellvect
+ * \return void
+ *
+ */
 void substage_decode(unordered_map<int,Cell*> &Cellvect)
 {
 

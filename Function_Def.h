@@ -1,6 +1,12 @@
 #ifndef Function_Def_h_inluded
 #define Function_Def_h_inluded
 
+/** \file Function_Def.h
+ *  \brief This header file is essentially used to declare all the functions in this code.
+ *
+ */
+
+
 //Init_Domain header
 void add_init_children(unordered_map<int,Cell*> &);
 void leaf_phys_vals(unordered_map<int,Cell*> &);

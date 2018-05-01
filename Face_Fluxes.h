@@ -1,15 +1,17 @@
 #ifndef face_fluxes_h_inluded
 #define face_fluxes_h_inluded
 
+/** \file Face_Fluxes.h
+ *  \brief Header file for datastructure related functions \n
+*/
 
-
-///////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////
-/// \fn    void calculate_central_fluxes(unordered_map<int,Cell*> &leafvector);
-/// \brief J.M. Hyman et al 1992 for Finite Volume Flux Constructions
-/// \brief These are central flux calculations without any dissipation
-///////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////
+/** \brief This function calculates central fluxes through finite volume interpolation \n
+ *  Refer J.M. Hyman et al 1992, Physica D for Finite Volume Flux Constructions \n
+ *  These fluxes are nondissipative
+ * \param unordered_map<int,Cell*> &Cellvect
+ * \return void
+ *
+ */
 void calculate_central_fluxes(unordered_map<int,Cell*> &leafvector)
 {
     for (auto citer_one=leafvector.begin();citer_one!=leafvector.end();citer_one++)
@@ -59,13 +61,15 @@ void calculate_central_fluxes(unordered_map<int,Cell*> &leafvector)
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////
-/// \fn    void calculate_monotonic_fluxes(unordered_map<int,Cell*> &leafvector);
-/// \brief Uses a combination of central fluxes where specified
-/// \brief Uses MUSCL, WENO elsewhere
-///////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////
+
+/** \brief This function calculates dissipative (or mononotic) fluxes through combination of finite volume interpolation and upwinding \n
+ *  Requires a global diss_level_thresh parameter under which only central interpolation happens - refer Control_Parameters.h \n
+ *  Above this minimum threshold for upwinding, we may apply WENO5/WENO3 through fully nonlinear weights or scale-selective weights (IJNMF concept) \n
+ *  We also have option for MUSCL
+ * \param unordered_map<int,Cell*> &Cellvect
+ * \return void
+ *
+ */
 void calculate_monotonic_fluxes(unordered_map<int,Cell*> &leafvector)
 {
     for (auto citer_one=leafvector.begin();citer_one!=leafvector.end();citer_one++)
@@ -130,13 +134,14 @@ void calculate_monotonic_fluxes(unordered_map<int,Cell*> &leafvector)
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////
-/// \fn    void calculate_local_fluxes(double q[],double (&f)[n_eq]);
-/// \brief Takes in two arrays by reference, q->conserved variables, f->fluxes from them
-/// \brief Has conditional statements for each system of equations
-///////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////
+/** \brief This function calculates local flux quantities given conserved variables \n
+ *  Requires an input array of floating point conserved variables and an 'empty' array of floating point fluxes which are populated \n
+ *  Flux definitions may be found in IJNMF \n
+ * \param double (&q)[n_eq]
+ * \param double (&f)[n_eq]
+ * \return void
+ *
+ */
 void calculate_local_fluxes(double (&q)[n_eq],double (&f)[n_eq])
 {
     if (n_eq==1)
@@ -235,12 +240,22 @@ void calculate_local_fluxes(double (&q)[n_eq],double (&f)[n_eq])
 //    }
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn    void weno3(double (&qm1)[n_eq], double (&q)[n_eq], double (&qp1)[n_eq], double (&qp2)[n_eq], double (&qright)[n_eq], double (&qleft)[n_eq])
-/// \brief We are calculating face reconstructions using 19-22 Dr. San paper CAF
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/** \brief This function calculates local left and right state reconstructions using WENO3 \n
+ *  Requires input arrays of floating point conserved variables at +- stencil locations \n
+ *  Also requires 2 empty arrays for left and right state reconstructions
+ *  Full mathematical setup may be found in IJNMF \n
+ *  Note that option of scale-selective WENO enforces extra linearized weighting of nonlinear coefficients \n
+ *  Formulated in the sense of the right cell face
+ * \param double (&qm1)[n_eq]
+ * \param double (&q)[n_eq]
+ * \param double (&qp1)[n_eq]
+ * \param double (&qp2)[n_eq]
+ * \param double (&qright)[n_eq]
+ * \param double (&qleft)[n_eq]
+ * \return void
+ *
+ */
 void weno3(int level, double (&qm1)[n_eq], double (&q)[n_eq], double (&qp1)[n_eq], double (&qp2)[n_eq], double (&qright)[n_eq], double (&qleft)[n_eq])
 {
     double d1=1.0/3.0;
@@ -299,11 +314,24 @@ void weno3(int level, double (&qm1)[n_eq], double (&q)[n_eq], double (&qp1)[n_eq
 }
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn    void weno5(double (&qm2)[n_eq], double (&qm1)[n_eq], double (&q)[n_eq], double (&qp1)[n_eq], double (&qp2)[n_eq], double (&qp3)[n_eq], double (&qright)[n_eq], double (&qleft)[n_eq])
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/** \brief This function calculates local left and right state reconstructions using WENO5 \n
+ *  Requires input arrays of floating point conserved variables at +- stencil locations \n
+ *  Also requires 2 empty arrays for left and right state reconstructions
+ *  Full mathematical setup may be found in IJNMF \n
+ *  Note that option of scale-selective WENO enforces extra linearized weighting of nonlinear coefficients \n
+ *  Formulated in the sense of the right cell face
+ * \param double (&qm2)[n_eq]
+ * \param double (&qm1)[n_eq]
+ * \param double (&q)[n_eq]
+ * \param double (&qp1)[n_eq]
+ * \param double (&qp2)[n_eq]
+ * \param double (&qp3)[n_eq]
+ * \param double (&qright)[n_eq]
+ * \param double (&qleft)[n_eq]
+ * \return void
+ *
+ */
 void weno5(int level, double (&qm2)[n_eq], double (&qm1)[n_eq], double (&q)[n_eq], double (&qp1)[n_eq], double (&qp2)[n_eq], double (&qp3)[n_eq], double (&qright)[n_eq], double (&qleft)[n_eq])
 {
 
@@ -379,12 +407,25 @@ void weno5(int level, double (&qm2)[n_eq], double (&qm1)[n_eq], double (&q)[n_eq
 }
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn    void weno6(int level, double (&qm2)[n_eq], double (&qm1)[n_eq], double (&q)[n_eq], double (&qp1)[n_eq], double (&qp2)[n_eq], double (&qp3)[n_eq], double (&qright)[n_eq], double (&qleft)[n_eq])
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void weno6(int level, double (&qm2)[n_eq], double (&qm1)[n_eq], double (&q)[n_eq], double (&qp1)[n_eq], double (&qp2)[n_eq], double (&qp3)[n_eq], double (&qright)[n_eq], double (&qleft)[n_eq])
+/** \brief This function calculates local left and right state reconstructions using WENO6 \n
+ *  Requires input arrays of floating point conserved variables at +- stencil locations \n
+ *  Also requires 2 empty arrays for left and right state reconstructions
+ *  Full mathematical setup may be found in IJNMF \n
+ *  Note that option of scale-selective WENO enforces extra linearized weighting of nonlinear coefficients \n
+ *  Formulated in the sense of the right cell face \n
+ *  This generally is not effective to damp oscillations
+ * \param double (&qm2)[n_eq]
+ * \param double (&qm1)[n_eq]
+ * \param double (&q)[n_eq]
+ * \param double (&qp1)[n_eq]
+ * \param double (&qp2)[n_eq]
+ * \param double (&qp3)[n_eq]
+ * \param double (&qright)[n_eq]
+ * \param double (&qleft)[n_eq]
+ * \return void
+ *
+ */
+ void weno6(int level, double (&qm2)[n_eq], double (&qm1)[n_eq], double (&q)[n_eq], double (&qp1)[n_eq], double (&qp2)[n_eq], double (&qp3)[n_eq], double (&qright)[n_eq], double (&qleft)[n_eq])
 {
     double d1=1.0/20.0;
     double d2=9.0/20.0;
@@ -486,13 +527,22 @@ void weno6(int level, double (&qm2)[n_eq], double (&qm1)[n_eq], double (&q)[n_eq
 }
 
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn    void muscl(double (&qm1)[n_eq], double (&q)[n_eq], double (&qp1)[n_eq], double (&qp2)[n_eq], double (&qright)[n_eq], double (&qleft)[n_eq])
-/// \brief We are calculating face reconstructions using 14,17,18 Dr. San paper CAF
-/// \brief Two types of limiters used 1 - MinMod 2 - MC
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/** \brief This function calculates local left and right state reconstructions using MUSCL \n
+ *  Requires input arrays of floating point conserved variables at +- stencil locations \n
+ *  Also requires 2 empty arrays for left and right state reconstructions
+ *  We are calculating face reconstructions using 14,17,18 Dr. San paper CAF \n
+ *  Two types of limiters used 1 - MinMod 2 - MC \n
+ *  Formulated in the sense of the right cell face
+ * \param double (&qm1)[n_eq]
+ * \param double (&q)[n_eq]
+ * \param double (&qp1)[n_eq]
+ * \param double (&qp2)[n_eq]
+ * \param double (&qright)[n_eq]
+ * \param double (&qleft)[n_eq]
+ * \return void
+ *
+ */
 void muscl(double (&qm1)[n_eq], double (&q)[n_eq], double (&qp1)[n_eq], double (&qp2)[n_eq], double (&qright)[n_eq], double (&qleft)[n_eq])
 {
 
@@ -575,12 +625,15 @@ void muscl(double (&qm1)[n_eq], double (&q)[n_eq], double (&qp1)[n_eq], double (
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn    void conservative_correction(unordered_map<int,Cell*> &leafvector,unordered_map<int,Cell*> &Cellvect)
-/// \brief Correct fluxes for conservativeness
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/** \brief This function corrects fluxes to ensure conservativeness  \n
+ * This is to ensure that overlapping cell boundaries have same incoming and outgoing fluxes \n
+ * Refer section 2.6 and equation 2.42 for details in Tenaud tutorial
+ * \param unordered_map<int,Cell*> &leafvector
+ * \param unordered_map<int,Cell*> &Cellvect
+ * \return void
+ *
+ */
 void conservative_correction(unordered_map<int,Cell*> &leafvector,unordered_map<int,Cell*> &Cellvect)
 {
     int level = max_level-1;

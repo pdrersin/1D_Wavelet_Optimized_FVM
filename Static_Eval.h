@@ -1,13 +1,19 @@
 #ifndef Static_Eval_h_inluded
 #define Static_Eval_h_inluded
 
+/** \file Static_Eval.h
+ *  \brief Header file for analyzing discrete wavelet transform implementation and accuracy for static problem \n
+ *  Refer IJNMF for Sine-Wave perturbation demo \n
+ *  Can be activated by uncommenting the analyse_static function in main.cpp (and hiding create_domain and evolution functions there)
+*/
 
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn void analyse_static(unordered_map<key,Cell*,hasher_key> &Cellvect)
-/// \brief This creates the initial domain for a static error check
-//////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////////////
+/** \brief This creates the initial domain for a static error check \n
+ *  Also performs thresholding, deletion etc etc to check L1 norm behavior at a snapshot in time \n
+ *  Error computed against analytical solution. \n
+ * \param unordered_map<int,Cell*> &Cellvect
+ * \return void
+ *
+ */
 void analyse_static(unordered_map<int,Cell*> &Cellvect)
 {
     //Creating root of this particular domain
@@ -76,6 +82,12 @@ void analyse_static(unordered_map<int,Cell*> &Cellvect)
 
 }
 
+/** \brief This specifies initial conditions for the static error check idea  \n
+ *  As usual physical values are specified on the leaves only \n
+ * \param unordered_map<int,Cell*> &Cellvect
+ * \return void
+ *
+ */
 void leaf_phys_vals_static(unordered_map<int,Cell*> &Cellvect)
 {
     for (auto citer_one=Cellvect.begin();citer_one!=Cellvect.end();citer_one++)

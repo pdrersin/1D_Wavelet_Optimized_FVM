@@ -2,13 +2,22 @@
 #define Force_flux_h_inluded
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/// \fn    void force_solver(Cell* &cell)
-/// \brief Reconstructs fluxes according to FORCE Approach
-/// \brief Fixed timestep specified by user
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/** \file Force_Flux.h
+ *  \brief Header file for FORCE based flux reconstructions from left and right states at a cell face \n
+ *  Not used IN IJNMF \n
+ *  Requires specification of timestep dt \n
+*/
+
+
+/** \brief This function takes a memory address to a Cell as input and calculates face fluxes \n
+ *  Choice of state reconstruction is determined by mflux option (i.e. WENO3,WENO5,MUSCL etc) \n
+ *  Note that wavespeeds for the FORCE reconstruction are calculated according to the local stencil. \n
+ *  Flux reconstructions are carried out at both left and right faces. \n
+ *  Fixed timestep specified by user
+ * \param Cell* &cellval
+ * \return void
+ *
+ */
 void force_solver(Cell* &cellval)
 {
     double f_right[n_eq] = {0.0};
